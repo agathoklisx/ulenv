@@ -1,0 +1,2 @@
+#!/bin/sh
+LD_LIBRARY_PATH=sys/Linux/x86_64/aot/devel/lib/ sys/Linux/x86_64/aot/devel/bin/lua

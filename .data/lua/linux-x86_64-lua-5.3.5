@@ -1,0 +1,15 @@
+#!/bin/sh
+
+LUA_PATH=./?.lua\;\
+sys/Linux/x86_64/lua/5.3.5/share/lua/5.3/?.lua\;\
+sys/Linux/x86_64/lua/5.3.5/share/lua/5.3/?/init.lua;
+
+export LUA_PATH
+LUA_CPATH=./?.so\;\
+sys/Linux/x86_64/lua/5.3.5/lib/lua/5.3/?.so\;\
+sys/Linux/x86_64/lua/5.3.5/share/lua/5.3/?.so
+
+export LUA_CPATH
+
+LD_LIBRARY_PATH=sys/Linux/x86_64/lua/5.3.5/lib/ \
+   sys/Linux/x86_64/lua/5.3.5/bin/lua $*

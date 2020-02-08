@@ -1,0 +1,2 @@
+#!/bin/sh
+LD_LIBRARY_PATH=sys/Linux/x86_64/lua/devel/lib/ sys/Linux/x86_64/lua/devel/bin/lua
