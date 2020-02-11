@@ -1,4 +1,4 @@
-# ------- PUC RIO MAKEFILE --------
+# ------- MOONJIT MAKEFILE --------
 
 include $(MAKEDIR)/common.Makefile
 

@@ -1,3 +1,3 @@
-# ------- PUC RIO MAKEFILE --------
+# ------- LUAROCKS MAKEFILE --------
 
 include $(MAKEDIR)/common.Makefile

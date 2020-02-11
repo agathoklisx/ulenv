@@ -1,4 +1,4 @@
-# ------- PUC RIO MAKEFILE --------
+# ------- RAVI LUA MAKEFILE --------
 
 include $(MAKEDIR)/common.Makefile
 

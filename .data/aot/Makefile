@@ -1,4 +1,4 @@
-# ------- PUC RIO MAKEFILE --------
+# ------- Ahead Of Time Lua MAKEFILE --------
 
 include $(MAKEDIR)/common.Makefile
 

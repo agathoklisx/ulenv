@@ -1,26 +1,21 @@
 # ULENV_VERSION    : 0.0.1
 # MAKEFILE_VERSION : 0.0.1
 
-# ---------------------- first draft --------------------------
 # Issues begin from the end
-
 
 # -------- Lua Implementations ------------
 PRIO_LUA    =  lua
 RAVI_LUA    =  ravi
 AOT_LUA     =  aot
 MOONJIT     =  moonjit
+NELUA       =  nelua
 
 # -------- Targets ------------------------
-PRIO_LUA_TARGET    = prio-lua
-RAVI_LUA_TARGET    = ravi-lua
-AOT_LUA_TARGET     = aot-lua
-MOONJIT_TARGET     = moonjit
-
-LUA_DEFAULT       := $(PRIO_LUA_TARGET)
-
-LUA_ROCKS_NAME     = luarocks
-LUA_ROCKS_VERSION := 3.3.0
+PRIO_LUA_TARGET  = prio-lua
+RAVI_LUA_TARGET  = ravi-lua
+AOT_LUA_TARGET   = aot-lua
+MOONJIT_TARGET   = moonjit
+NELUA_TARGET     = nelua
 
 # --------- abstraction -----
 OS          := $(shell uname -s)
@@ -50,7 +45,7 @@ CC          := gcc
 GET_VERBOSE_LEVEL := 0
 UNPACK_METH_ARGS  :=
 
-# --------  details ---------------
+# --------  inner details ---------------
 ROOTDIR          = $(shell pwd)
 SYSDIR           = $(ROOTDIR)/sys/$(OS)/$(MACHINE)
 SRCDIR           = $(ROOTDIR)/src
@@ -137,7 +132,7 @@ PRIO_LUA_PACK_ABSPATH = $(PRIO_LUA_SRCDIR)/$(PRIO_LUA_PACK)
 PRIO_LUA_PACKAGE_REPO_DIR = $(PRIO_LUA_BUILDDIR)/repo
 
 PRIO_LUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
-  "IMPLEMENTATION=lua" "MYDIR=$(PRIO_LUA_THISDIR)"                            \
+  "IMPLEMENTATION=$(PRIO_LUA)" "MYDIR=$(PRIO_LUA_THISDIR)"                    \
   "VERSION=$(PRIO_LUA_VERSION)" "UPSTREAM_REPO=$(PRIO_LUA_REPO)"              \
   "REPO_ABSPATH=$(PRIO_LUA_SRC_REPO)" "REPO_NAME=repo"                        \
   "SRCDIR=$(SRCDIR)/$(PRIO_LUA)" "PACKAGE_URL=$(PRIO_LUA_URL)"                \
@@ -213,7 +208,7 @@ RAVI_LUA_PACK_ABSPATH = $(RAVI_LUA_SRCDIR)/$(RAVI_LUA_PACK)
 RAVI_LUA_PACKAGE_REPO_DIR = $(RAVI_LUA_BUILDDIR)/repo
 
 RAVI_LUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
-  "IMPLEMENTATION=ravi" "MYDIR=$(RAVI_LUA_THISDIR)"                           \
+  "IMPLEMENTATION=$(RAVI_LUA)" "MYDIR=$(RAVI_LUA_THISDIR)"                    \
   "VERSION=$(RAVI_LUA_VERSION)" "UPSTREAM_REPO=$(RAVI_LUA_REPO)"              \
   "REPO_ABSPATH=$(RAVI_LUA_SRC_REPO)" "REPO_NAME=repo"                        \
   "SRCDIR=$(SRCDIR)/$(RAVI_LUA)" "PACKAGE_URL=$(RAVI_LUA_URL)"                \
@@ -280,7 +275,7 @@ AOT_LUA_PACK_ABSPATH = $(AOT_LUA_SRCDIR)/$(AOT_LUA_PACK)
 AOT_LUA_PACKAGE_REPO_DIR = $(AOT_LUA_BUILDDIR)/repo
 
 AOT_LUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
-  "IMPLEMENTATION=aot" "MYDIR=$(AOT_LUA_THISDIR)"                            \
+  "IMPLEMENTATION=$(AOT_LUA)" "MYDIR=$(AOT_LUA_THISDIR)"                     \
   "VERSION=$(AOT_LUA_VERSION)" "UPSTREAM_REPO=$(AOT_LUA_REPO)"               \
   "REPO_ABSPATH=$(AOT_LUA_SRC_REPO)" "REPO_NAME=repo"                        \
   "SRCDIR=$(SRCDIR)/$(AOT_LUA)" "PACKAGE_URL=$(AOT_LUA_URL)"                 \
@@ -307,11 +302,11 @@ aot-lua-clone-repo: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
 aot-lua-update-repo: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
 	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) update-repo
 
-aot-lua-get-package: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
-	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) get-package
+# aot-lua-get-package: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
+#	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) get-package
 
-aot-lua-extract-package: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
-	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) extract-package
+# aot-lua-extract-package: aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
+#	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) extract-package
 
 aot-lua-makeenv:
 	@$(TEST) -d $(AOT_LUA_SRCDIR)      || $(MAKDIR_P) $(VERBOSE_ARG) $(AOT_LUA_SRCDIR)
@@ -353,7 +348,7 @@ MOONJIT_PACK_ABSPATH = $(MOONJIT_SRCDIR)/$(MOONJIT_PACK)
 MOONJIT_PACKAGE_REPO_DIR = $(MOONJIT_BUILDDIR)/repo
 
 MOONJIT_MAKE_ARGS    = $(MAKE_ARGS)                                           \
-  "IMPLEMENTATION=moonjit" "MYDIR=$(MOONJIT_THISDIR)"                         \
+  "IMPLEMENTATION=$(MOONJIT)" "MYDIR=$(MOONJIT_THISDIR)"                      \
   "VERSION=$(MOONJIT_VERSION)" "UPSTREAM_REPO=$(MOONJIT_REPO)"                \
   "REPO_ABSPATH=$(MOONJIT_SRC_REPO)" "REPO_NAME=repo"                         \
   "SRCDIR=$(SRCDIR)/$(MOONJIT)" "PACKAGE_URL=$(MOONJIT_URL)"                  \
@@ -405,6 +400,69 @@ moonjit-update-makefile:
 	@$(TEST) -f $(MOONJIT_MAKEFILE_IN) || exit 1
 	@$(COPY) $(VERBOSE_ARG) $(MOONJIT_MAKEFILE_IN) $(MOONJIT_MAKEFILE)
 
+# ------ NELUA env and targets ----------------
+NELUA_VERSION     :=
+NELUA_REPO         = https://github.com/edubart/nelua-lang
+NELUA_ROCKSPEC     = https://raw.githubusercontent.com/edubart/nelua-lang/master/rockspecs/nelua-dev-1.rockspec
+NELUA_SRCDIR       = $(SRCDIR)/$(NELUA)
+NELUA_SRC_REPO     = $(NELUA_SRCDIR)/repo
+NELUA_THISDIR      = $(THIS_DATADIR)/$(NELUA)
+NELUA_MAKEFILE_IN  = $(NELUA_THISDIR)/Makefile
+NELUA_MAKEFILE     = $(NELUA_SRCDIR)/Makefile
+
+NELUA_SYSDIR       = $(SYSDIR)/$(NELUA)/$(NELUA_VERSION)
+NELUA_PACKAGE_NAME = $(NELUA_VERSION)
+NELUA_PACKAGE_DIR  = $(NELUA_BUILDDIR)/$(NELUA)-$(NELUA_PACKAGE_NAME)
+NELUA_PACK         = $(NELUA_PACKAGE_NAME).$(NELUA_PACK_FMT)
+NELUA_URL          = $(NELUA_UPSTR_DIST)/$(NELUA_PACK)
+NELUA_PACK_ABSPATH = $(NELUA_SRCDIR)/$(NELUA_PACK)
+NELUA_PACKAGE_REPO_DIR = $(NELUA_BUILDDIR)/repo
+
+NELUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
+  "IMPLEMENTATION=$(NELUA)" "MYDIR=$(NELUA_THISDIR)"                       \
+  "VERSION=$(NELUA_VERSION)" "UPSTREAM_REPO=$(NELUA_REPO)"                 \
+  "REPO_ABSPATH=$(NELUA_SRC_REPO)" "REPO_NAME=repo"                        \
+  "SRCDIR=$(SRCDIR)/$(NELUA)" "PACKAGE_URL=$(NELUA_URL)"                   \
+  "PACKAGE_SRC=$(NELUA_PACK_ABSPATH)" "UNPACK=$(UNZIP)"                    \
+  "BUILDDIR=$(NELUA_BUILDDIR)" "PACKAGE_DIR=$(NELUA_PACKAGE_DIR)"          \
+  "SYSDIR=$(NELUA_SYSDIR)" "PACKAGE_REPO_DIR=$(NELUA_PACKAGE_REPO_DIR)"    \
+  "INCLUDE_SYSDIR=$(NELUA_SYSDIR)/include"
+
+nelua: makeenv checkenv nelua-makeenv nelua-checkenv \
+      nelua-update-makefile luarocks-get-package luarocks-extract-package
+	@cd $(NELUA_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)  \
+      "SYSDIR=$(NELUA_SYSDIR)"  build-package
+	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)  \
+      "SYSDIR=$(NELUA_SYSDIR)"   $(LUAROCKS_MAKE_ARGS) luarocks-build
+	@cd $(NELUA_SYSDIR)/bin && ./luarocks install $(NELUA_ROCKSPEC)
+
+nelua-clone-repo: nelua-makeenv nelua-checkenv nelua-update-makefile
+	@cd $(NELUA_SRCDIR) && $(MAKE) $(NELUA_MAKE_ARGS) clone-repo
+
+nelua-update-repo: nelua-makeenv nelua-checkenv nelua-update-makefile
+	@cd $(NELUA_SRCDIR) && $(MAKE) $(NELUA_MAKE_ARGS) update-repo
+
+nelua-makeenv:
+	@$(TEST) -d $(NELUA_SRCDIR)      || $(MAKDIR_P) $(VERBOSE_ARG) $(NELUA_SRCDIR)
+	@$(TEST) -d $(NELUA_BUILDDIR)    || $(MAKDIR_P) $(NELUA_BUILDDIR)
+	@$(TEST) -d $(NELUA_SYSDIR)      || $(MAKDIR_P) $(NELUA_SYSDIR)
+	@$(TEST) -f $(NELUA_MAKEFILE)    || $(COPY) $(VERBOSE_ARG) $(NELUA_MAKEFILE_IN) $(NELUA_MAKEFILE)
+
+nelua-checkenv:
+	@$(TEST) -w $(NELUA_SRCDIR)      || exit 1
+	@$(TEST) -w $(NELUA_BUILDDIR)    || exit 1
+	@$(TEST) -w $(NELUA_SYSDIR)      || exit 1
+	@$(TEST) -r $(NELUA_MAKEFILE)    || exit 1
+
+nelua-update-makefile:
+	@$(TEST) -f $(NELUA_MAKEFILE_IN) || exit 1
+	@$(COPY) $(VERBOSE_ARG) $(NELUA_MAKEFILE_IN) $(NELUA_MAKEFILE)
+
+# --------- end of targets ---------------------
+
+all: prio-lua prio-lua-devel ravi-lua ravi-lua-devel aot-lua-devel moonjit-devel \
+     moonjit nelua
+
 # --------- Lua Rocks --------------------------
 
 LUAROCKS                   = luarocks
@@ -453,7 +511,7 @@ luarocks-update-makefile:
 	@$(TEST) -f $(LUAROCKS_MAKEFILE_IN) || exit 1
 	$(COPY) $(VERBOSE_ARG) $(LUAROCKS_MAKEFILE_IN) $(LUAROCKS_MAKEFILE)
 
-# ----- end of targets ----------
+# ----- inner targets ----------
 makeenv:
 	@$(TEST) -d $(SYSDIR) || $(MAKDIR_P) $(VERBOSE_ARG) $(SYSDIR)
 	@$(TEST) -d $(BINDIR) || $(MAKDIR)   $(VERBOSE_ARG) $(BINDIR)
@@ -461,14 +519,6 @@ makeenv:
 checkenv:
 	@$(TEST) -w $(SYSDIR) || exit 1
 	@$(TEST) -w $(BINDIR) || exit 1
-
-VALGRIND = valgrind
-VALGRIND_ARGS = --leak-check=full --show-leak-kinds=all -v --track-origins=yes
-GDB = gdb
-GDB_ARGS = --quiet -ex "set logging file /tmp/gdb.txt" -ex "set logging on" -ex run --args
-
-all: prio-lua prio-lua-devel ravi-lua ravi-lua-devel aot-lua-devel moonjit-devel \
-     moonjit
 
 #---------- debug ------------------
 debug:
@@ -485,12 +535,48 @@ debug:
 	@echo "makefile in " $(PRIO_LUA_MAKEFILE_IN)
 	@echo $(PRIO_LUA_SRC_REPO)
 
-#----------------------------------------------------------#
-# 0008 symbolic link to sys/bin/lua which by default to PUC Rio lua
-# make a target to manipulate
+VALGRIND = valgrind
+VALGRIND_ARGS = --leak-check=full --show-leak-kinds=all -v --track-origins=yes
+GDB = gdb
+GDB_ARGS = --quiet -ex "set logging file /tmp/gdb.txt" -ex "set logging on" -ex run --args
 
+#----------------------------------------------------------#
+# 0011 add an info target to output some information
+
+# 0010 is += portable to BSD make?
+
+# 0009 build readline (even better a Lua made readline)
+
+# 0008 symlink to sys/bin/lua which by default will point to current PUC Rio Lua
+# make a target to manipulate
+#
 # 0007 export LUA_PATH in the wrappers
-# which path will be best? see .data/lua/linux-x86_64-lua-5.3.5
+# which path will be best? see .data/lua/linux-x86_64-lua-5.3.5 or:
+#
+# OS=$(uname -s)
+# MACHINE=$(uname -m)
+# 
+# INTERPRETER_NAME=lua
+# TARGET=lua
+# SRCDIR=5.3.5
+# BRANCH=5.3
+# 
+# SYSDIR=$(realpath \
+# $(cd "$(dirname "$0")" && pwd)/../$OS/$MACHINE/$TARGET/$SRCDIR)
+# 
+# LUA_SHAREDIR=$SYSDIR/share/lua/$BRANCH
+# LUA_PATH=$LUA_SHAREDIR/?.lua\;$LUA_SHAREDIR/?/init.lua
+# 
+# LUA_LIBDIR=$SYSDIR/lib/lua/$BRANCH
+# LUA_CPATH=$LUA_LIBDIR/?.so\;$LUA_SHAREDIR/?.so
+# 
+# export LUA_PATH LUA_CPATH
+# 
+# BINDIR=$SYSDIR/bin
+# LIBDIR=$SYSDIR/lib
+# 
+# LD_LIBRARY_PATH=$LIBDIR  $BINDIR/$INTERPRETER_NAME $*
+# resol: is it portable to dmake of BSD?
 
 # 0006 wrappers for 32bits systems
 
@@ -498,12 +584,12 @@ debug:
 # put more targets in their corresponded Makefile
 
 # 0004 lua-devel
-# builds for linux
-# doesn't build luac
+# a. builds for linux only
+# b. doesn't build luac
 # resol: ignore for now
 
 # 0003 MKDIR classes with MKDIR from upstrean
-# solution: rename this to MAKDIR
+# solution: rename this to MAKDIR (DONE)
 
 # 0002  ISUNIX
 # ifeq (-$(OS), -Linux)
@@ -513,7 +599,6 @@ debug:
 # endif
 # 
 # Resol: maybe usefull (ignore for now)
-
 
 # 0001  Portability
 # OS       := $(shell uname -s)
