@@ -1,2 +1,24 @@
 #!/bin/sh
-LD_LIBRARY_PATH=sys/Linux/x86_64/lua/5.3.5/lib/ sys/Linux/x86_64/lua/5.3.5/bin/lua
+OS=$(uname -s)
+MACHINE=$(uname -m)
+
+INTERPRETER_NAME=lua
+TARGET=ravi
+SRCDIR=1.0-beta3
+BRANCH=5.3
+
+SYSDIR=$(realpath \
+$(cd "$(dirname "$0")" && pwd)/../$OS/$MACHINE/$TARGET/$SRCDIR)
+
+LUA_SHAREDIR=$SYSDIR/share/lua/$BRANCH
+LUA_PATH=$LUA_SHAREDIR/?.lua\;$LUA_SHAREDIR/?/init.lua
+
+LUA_LIBDIR=$SYSDIR/lib/lua/$BRANCH
+LUA_CPATH=$LUA_LIBDIR/?.so\;$LUA_SHAREDIR/?.so
+
+export LUA_PATH LUA_CPATH
+
+BINDIR=$SYSDIR/bin
+LIBDIR=$SYSDIR/lib
+
+LD_LIBRARY_PATH=$LIBDIR  $BINDIR/$INTERPRETER_NAME $@

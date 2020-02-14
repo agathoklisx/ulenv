@@ -153,6 +153,7 @@ prio-lua-devel: makeenv checkenv prio-lua-makeenv prio-lua-checkenv \
         "SYSDIR=$(PRIO_LUA_SYSDIR)/../devel" "VERSION=devel" build-lua-devel
 	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)  \
         "SYSDIR=$(PRIO_LUA_SYSDIR)/../devel" "VERSION=devel" \
+        "INCLUDE_SYSDIR=$(PRIO_LUA_SYSDIR)/../devel/include" \
         $(LUAROCKS_MAKE_ARGS) luarocks-build
 
 prio-lua-clone-repo: prio-lua-makeenv prio-lua-checkenv prio-lua-update-makefile
@@ -253,7 +254,8 @@ ravi-lua-update-makefile:
 
 #--------- Ahead Of Time Lua and Targets ---------
 AOT_LUA_VERSION     := 5.4
-AOT_LUA_REPO         = https://github.com/hugomg/lua-aot-5.4
+AOT_LUA_BASE_REPO    = https://github.com/hugomg
+AOT_LUA_REPO         = $(AOT_LUA_BASE_REPO)/lua-aot-$(AOT_LUA_VERSION)
 AOT_LUA_SRCDIR       = $(SRCDIR)/$(AOT_LUA)
 AOT_LUA_SRC_REPO     = $(AOT_LUA_SRCDIR)/repo
 AOT_LUA_THISDIR      = $(THIS_DATADIR)/$(AOT_LUA)
@@ -284,8 +286,19 @@ AOT_LUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
   "SYSDIR=$(AOT_LUA_SYSDIR)" "PACKAGE_REPO_DIR=$(AOT_LUA_PACKAGE_REPO_DIR)"  \
   "INCLUDE_SYSDIR=$(AOT_LUA_SYSDIR)/include"
 
-#aot-lua: makeenv checkenv aot-lua-makeenv aot-lua-checkenv aot-lua-update-makefile
-#	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS) build-package
+aot-lua: makeenv checkenv aot-lua-makeenv aot-lua-checkenv \
+      aot-lua-update-makefile luarocks-get-package luarocks-extract-package
+	@cd $(AOT_LUA_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS)     \
+       "VERSION=5.3"                                          \
+       "UPSTREAM_REPO=$(AOT_LUA_BASE_REPO)/lua-$(AOT_LUA)"    \
+       "SYSDIR=$(SYSDIR)/$(AOT_LUA)/5.3"                      \
+       "REPO_ABSPATH=$(AOT_LUA_SRCDIR)/5.3" "REPO_NAME=5.3"   \
+       "PACKAGE_REPO_DIR=$(AOT_LUA_BUILDDIR)/5.3"             \
+       build-aot-devel
+	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(AOT_LUA_MAKE_ARGS)    \
+        "INCLUDE_SYSDIR=$(SYSDIR)/$(AOT_LUA)/5.3/include"     \
+        "SYSDIR=$(SYSDIR)/$(AOT_LUA)/5.3"                     \
+        $(LUAROCKS_MAKE_ARGS) luarocks-build
 
 aot-lua-devel: makeenv checkenv aot-lua-makeenv aot-lua-checkenv \
       aot-lua-update-makefile luarocks-get-package luarocks-extract-package
@@ -428,12 +441,14 @@ NELUA_MAKE_ARGS    = $(MAKE_ARGS)                                          \
   "SYSDIR=$(NELUA_SYSDIR)" "PACKAGE_REPO_DIR=$(NELUA_PACKAGE_REPO_DIR)"    \
   "INCLUDE_SYSDIR=$(NELUA_SYSDIR)/include"
 
-nelua: makeenv checkenv nelua-makeenv nelua-checkenv \
+nelua: makeenv checkenv nelua-makeenv nelua-checkenv         \
       nelua-update-makefile luarocks-get-package luarocks-extract-package
-	@cd $(NELUA_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)  \
+	@cd $(NELUA_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)     \
       "SYSDIR=$(NELUA_SYSDIR)"  build-package
 	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)  \
-      "SYSDIR=$(NELUA_SYSDIR)"   $(LUAROCKS_MAKE_ARGS) luarocks-build
+      "SYSDIR=$(NELUA_SYSDIR)"                               \
+      "INCLUDE_SYSDIR=$(NELUA_SYSDIR)/include"               \
+      $(LUAROCKS_MAKE_ARGS) luarocks-build
 	@cd $(NELUA_SYSDIR)/bin && ./luarocks install $(NELUA_ROCKSPEC)
 
 nelua-clone-repo: nelua-makeenv nelua-checkenv nelua-update-makefile

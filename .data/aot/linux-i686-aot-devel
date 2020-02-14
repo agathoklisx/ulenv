@@ -4,9 +4,9 @@ OS=$(uname -s)
 MACHINE=$(uname -m)
 
 INTERPRETER_NAME=lua
-TARGET=lua
-SRCDIR=5.3.5
-BRANCH=5.3
+TARGET=aot
+SRCDIR=devel
+BRANCH=5.4
 
 SYSDIR=$(realpath \
 $(cd "$(dirname "$0")" && pwd)/../$OS/$MACHINE/$TARGET/$SRCDIR)
