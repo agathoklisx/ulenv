@@ -1,3 +1,3 @@
-# ------- NELUA MAKEFILE --------
+# ------- FENNEL MAKEFILE --------
 
 include $(MAKEDIR)/common.Makefile

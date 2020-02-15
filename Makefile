@@ -10,6 +10,7 @@ AOT_LUA     =  aot
 MOONJIT     =  moonjit
 NELUA       =  nelua
 MOONSCRIPT  =  moonscript
+FENNEL      =  fennel
 
 # --------- abstraction -----
 OS          := $(shell uname -s)
@@ -537,10 +538,70 @@ moonscript-update-makefile:
 	@$(TEST) -f $(MOONSCRIPT_MAKEFILE_IN) || exit 1
 	@$(COPY) $(VERBOSE_ARG) $(MOONSCRIPT_MAKEFILE_IN) $(MOONSCRIPT_MAKEFILE)
 
+# ------ FENNEL env and targets ----------------
+FENNEL_VERSION     :=
+FENNEL_REPO         = https://github.com/bakpakin/Fennel
+FENNEL_ROCKSPEC     =
+FENNEL_SRCDIR       = $(SRCDIR)/$(FENNEL)
+FENNEL_SRC_REPO     = $(FENNEL_SRCDIR)/repo
+FENNEL_THISDIR      = $(THIS_DATADIR)/$(FENNEL)
+FENNEL_MAKEFILE_IN  = $(FENNEL_THISDIR)/Makefile
+FENNEL_MAKEFILE     = $(FENNEL_SRCDIR)/Makefile
+
+FENNEL_SYSDIR       = $(SYSDIR)/$(FENNEL)/$(FENNEL_VERSION)
+FENNEL_PACKAGE_NAME = $(FENNEL_VERSION)
+FENNEL_PACKAGE_DIR  = $(FENNEL_BUILDDIR)/$(FENNEL)-$(FENNEL_PACKAGE_NAME)
+FENNEL_PACK         = $(FENNEL_PACKAGE_NAME).$(FENNEL_PACK_FMT)
+FENNEL_URL          = $(FENNEL_UPSTR_DIST)/$(FENNEL_PACK)
+FENNEL_PACK_ABSPATH = $(FENNEL_SRCDIR)/$(FENNEL_PACK)
+FENNEL_PACKAGE_REPO_DIR = $(FENNEL_BUILDDIR)/repo
+
+FENNEL_MAKE_ARGS    = $(MAKE_ARGS)                                           \
+  "IMPLEMENTATION=$(FENNEL)" "MYDIR=$(FENNEL_THISDIR)"                       \
+  "VERSION=$(FENNEL_VERSION)" "UPSTREAM_REPO=$(FENNEL_REPO)"                 \
+  "REPO_ABSPATH=$(FENNEL_SRC_REPO)" "REPO_NAME=repo"                         \
+  "SRCDIR=$(SRCDIR)/$(FENNEL)" "PACKAGE_URL=$(FENNEL_URL)"                   \
+  "PACKAGE_SRC=$(FENNEL_PACK_ABSPATH)" "UNPACK=$(UNZIP)"                     \
+  "BUILDDIR=$(FENNEL_BUILDDIR)" "PACKAGE_DIR=$(FENNEL_PACKAGE_DIR)"          \
+  "SYSDIR=$(FENNEL_SYSDIR)" "PACKAGE_REPO_DIR=$(FENNEL_PACKAGE_REPO_DIR)"    \
+  "INCLUDE_SYSDIR=$(FENNEL_SYSDIR)/include"
+
+fennel: makeenv checkenv fennel-makeenv fennel-checkenv         \
+      fennel-update-makefile luarocks-get-package luarocks-extract-package
+	@cd $(FENNEL_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)       \
+      "SYSDIR=$(FENNEL_SYSDIR)"  build-package
+	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)     \
+      "SYSDIR=$(FENNEL_SYSDIR)"                                 \
+      "INCLUDE_SYSDIR=$(FENNEL_SYSDIR)/include"                 \
+      $(LUAROCKS_MAKE_ARGS) luarocks-build
+	@cd $(FENNEL_SYSDIR)/bin && ./luarocks install fennel
+
+fennel-clone-repo: fennel-makeenv fennel-checkenv fennel-update-makefile
+	@cd $(FENNEL_SRCDIR) && $(MAKE) $(FENNEL_MAKE_ARGS) clone-repo
+
+fennel-update-repo: fennel-makeenv fennel-checkenv fennel-update-makefile
+	@cd $(FENNEL_SRCDIR) && $(MAKE) $(FENNEL_MAKE_ARGS) update-repo
+
+fennel-makeenv:
+	@$(TEST) -d $(FENNEL_SRCDIR)      || $(MAKDIR_P) $(VERBOSE_ARG) $(FENNEL_SRCDIR)
+	@$(TEST) -d $(FENNEL_BUILDDIR)    || $(MAKDIR_P) $(FENNEL_BUILDDIR)
+	@$(TEST) -d $(FENNEL_SYSDIR)      || $(MAKDIR_P) $(FENNEL_SYSDIR)
+	@$(TEST) -f $(FENNEL_MAKEFILE)    || $(COPY) $(VERBOSE_ARG) $(FENNEL_MAKEFILE_IN) $(FENNEL_MAKEFILE)
+
+fennel-checkenv:
+	@$(TEST) -w $(FENNEL_SRCDIR)      || exit 1
+	@$(TEST) -w $(FENNEL_BUILDDIR)    || exit 1
+	@$(TEST) -w $(FENNEL_SYSDIR)      || exit 1
+	@$(TEST) -r $(FENNEL_MAKEFILE)    || exit 1
+
+fennel-update-makefile:
+	@$(TEST) -f $(FENNEL_MAKEFILE_IN) || exit 1
+	@$(COPY) $(VERBOSE_ARG) $(FENNEL_MAKEFILE_IN) $(FENNEL_MAKEFILE)
+
 # --------- end of targets ---------------------
 
 all: prio-lua prio-lua-devel ravi-lua ravi-lua-devel aot-lua-devel moonjit-devel \
-     moonjit nelua moonscript moonscript-devel
+     moonjit nelua moonscript moonscript-devel fennel
 
 # --------- Lua Rocks --------------------------
 
@@ -654,10 +715,13 @@ GDB_ARGS = --quiet -ex "set logging file /tmp/gdb.txt" -ex "set logging on" -ex 
 # BINDIR=$SYSDIR/bin
 # LIBDIR=$SYSDIR/lib
 # 
+# resol: Done
+
 # LD_LIBRARY_PATH=$LIBDIR  $BINDIR/$INTERPRETER_NAME $*
 # resol: is it portable to dmake of BSD?
 
 # 0006 wrappers for 32bits systems
+# resol: Done
 
 # 0005 hide more details
 # put more targets in their corresponded Makefile

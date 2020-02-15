@@ -34,8 +34,11 @@ It builds the following targets:
    - stable
    - development sources
 
-Usage:
+  - Fennel - https://fennel-lang.org/
+   - stable
 */
+```
+Usage:
 
 ```sh
   # by default builds PUC Rio Lua 5.3.5 plus luarocks at the same sys hierarchy
@@ -65,10 +68,15 @@ Usage:
   make nelua
 
   #  MoonScript (this builds by default lua-5.3.5 and calls luarocks to install
-  #  moonscripts' compiler - it doesn't provide a wrapper for now, moonscript does
+  #  moonscript's compiler - it doesn't provide a wrapper for now, moonscript does
   #  it by itself)
   make moonscript
   make moonscript-devel
+
+  #  Fennel (this builds by default lua-5.3.5 and calls luarocks to install
+  #  fennel's compiler - it doesn't provide a wrapper for now, fennel does
+  #  it by itself)
+  make fennel
 
   # and this builds all the above targets
   make all
@@ -92,15 +100,18 @@ Usage:
   make moonscript-clone-repo
   make moonscript-update-repo
 
+  make fennel-clone-repo
+  make fennel-update-repo
+
   # Hierarchy:
 
   # ROOTDIR (this directory)
 
   # sources directory
-  # $ROOTDIR/src/{lua,ravi,aot,moonjit,nelua}/{RELEASE,repo}
+  # $ROOTDIR/src/{lua,ravi,aot,moonjit,nelua,moonscript,fennel}/{RELEASE,repo}
 
   # build directory
-  # $ROOTDIR/src/build/{lua,ravi,aot,moonjit}/{RELEASE,repo}
+  # $ROOTDIR/src/build/{lua,ravi,aot,moonjit,...}/{RELEASE,repo}
 
   # sys directory
   # $ROOTDIR/sys/`uname -s`/`uname -m`/{VERSION,devel}/{bin,lib,include,share}
