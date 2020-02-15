@@ -5,7 +5,6 @@
 This is to explore some possibilities and aims to demonstrate the power of diversity
 in the Lua Universe.
 
-
 At this stage is at the prototype level, but already usefull at least as a testing
 tool and as a basis to extend Lua on other domains besides embedded environments.
 
@@ -30,6 +29,10 @@ It builds the following targets:
 
   - NeLua - https://github.com/edubart/nelua-lang
     - dev-1
+
+  - MoonScript - https://moonscript.org/
+   - stable
+   - development sources
 
 Usage:
 */
@@ -61,6 +64,12 @@ Usage:
   #  compiler - it doesn't provide a wrapper for now, NeLua does it by itself)
   make nelua
 
+  #  MoonScript (this builds by default lua-5.3.5 and calls luarocks to install
+  #  moonscripts' compiler - it doesn't provide a wrapper for now, moonscript does
+  #  it by itself)
+  make moonscript
+  make moonscript-devel
+
   # and this builds all the above targets
   make all
 
@@ -79,6 +88,9 @@ Usage:
 
   make nelua-clone-repo
   make nelua-update-repo
+
+  make moonscript-clone-repo
+  make moonscript-update-repo
 
   # Hierarchy:
 

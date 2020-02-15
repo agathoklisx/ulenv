@@ -2,4 +2,4 @@
 
 include $(MAKEDIR)/common.Makefile
 
-build-nelua-devel: build-devel copy-exec-wrapper
+build-nelua-devel: build-devel

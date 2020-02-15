@@ -9,13 +9,7 @@ RAVI_LUA    =  ravi
 AOT_LUA     =  aot
 MOONJIT     =  moonjit
 NELUA       =  nelua
-
-# -------- Targets ------------------------
-PRIO_LUA_TARGET  = prio-lua
-RAVI_LUA_TARGET  = ravi-lua
-AOT_LUA_TARGET   = aot-lua
-MOONJIT_TARGET   = moonjit
-NELUA_TARGET     = nelua
+MOONSCRIPT  =  moonscript
 
 # --------- abstraction -----
 OS          := $(shell uname -s)
@@ -473,10 +467,80 @@ nelua-update-makefile:
 	@$(TEST) -f $(NELUA_MAKEFILE_IN) || exit 1
 	@$(COPY) $(VERBOSE_ARG) $(NELUA_MAKEFILE_IN) $(NELUA_MAKEFILE)
 
+# ------ MOONSCRIPT env and targets ----------------
+MOONSCRIPT_VERSION     :=
+MOONSCRIPT_REPO         = https://github.com/leafo/moonscript
+MOONSCRIPT_ROCKSPEC     = https://luarocks.org/manifests/leafo/moonscript-dev-1.rockspec
+MOONSCRIPT_SRCDIR       = $(SRCDIR)/$(MOONSCRIPT)
+MOONSCRIPT_SRC_REPO     = $(MOONSCRIPT_SRCDIR)/repo
+MOONSCRIPT_THISDIR      = $(THIS_DATADIR)/$(MOONSCRIPT)
+MOONSCRIPT_MAKEFILE_IN  = $(MOONSCRIPT_THISDIR)/Makefile
+MOONSCRIPT_MAKEFILE     = $(MOONSCRIPT_SRCDIR)/Makefile
+
+MOONSCRIPT_SYSDIR       = $(SYSDIR)/$(MOONSCRIPT)/$(MOONSCRIPT_VERSION)
+MOONSCRIPT_PACKAGE_NAME = $(MOONSCRIPT_VERSION)
+MOONSCRIPT_PACKAGE_DIR  = $(MOONSCRIPT_BUILDDIR)/$(MOONSCRIPT)-$(MOONSCRIPT_PACKAGE_NAME)
+MOONSCRIPT_PACK         = $(MOONSCRIPT_PACKAGE_NAME).$(MOONSCRIPT_PACK_FMT)
+MOONSCRIPT_URL          = $(MOONSCRIPT_UPSTR_DIST)/$(MOONSCRIPT_PACK)
+MOONSCRIPT_PACK_ABSPATH = $(MOONSCRIPT_SRCDIR)/$(MOONSCRIPT_PACK)
+MOONSCRIPT_PACKAGE_REPO_DIR = $(MOONSCRIPT_BUILDDIR)/repo
+
+MOONSCRIPT_MAKE_ARGS    = $(MAKE_ARGS)                                          \
+  "IMPLEMENTATION=$(MOONSCRIPT)" "MYDIR=$(MOONSCRIPT_THISDIR)"                       \
+  "VERSION=$(MOONSCRIPT_VERSION)" "UPSTREAM_REPO=$(MOONSCRIPT_REPO)"                 \
+  "REPO_ABSPATH=$(MOONSCRIPT_SRC_REPO)" "REPO_NAME=repo"                        \
+  "SRCDIR=$(SRCDIR)/$(MOONSCRIPT)" "PACKAGE_URL=$(MOONSCRIPT_URL)"                   \
+  "PACKAGE_SRC=$(MOONSCRIPT_PACK_ABSPATH)" "UNPACK=$(UNZIP)"                    \
+  "BUILDDIR=$(MOONSCRIPT_BUILDDIR)" "PACKAGE_DIR=$(MOONSCRIPT_PACKAGE_DIR)"          \
+  "SYSDIR=$(MOONSCRIPT_SYSDIR)" "PACKAGE_REPO_DIR=$(MOONSCRIPT_PACKAGE_REPO_DIR)"    \
+  "INCLUDE_SYSDIR=$(MOONSCRIPT_SYSDIR)/include"
+
+moonscript: makeenv checkenv moonscript-makeenv moonscript-checkenv         \
+      moonscript-update-makefile luarocks-get-package luarocks-extract-package
+	@cd $(MOONSCRIPT_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)     \
+      "SYSDIR=$(MOONSCRIPT_SYSDIR)"  build-package
+	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)       \
+      "SYSDIR=$(MOONSCRIPT_SYSDIR)"                               \
+      "INCLUDE_SYSDIR=$(MOONSCRIPT_SYSDIR)/include"               \
+      $(LUAROCKS_MAKE_ARGS) luarocks-build
+	@cd $(MOONSCRIPT_SYSDIR)/bin && ./luarocks install moonscript
+
+moonscript-devel: makeenv checkenv moonscript-makeenv moonscript-checkenv         \
+      moonscript-update-makefile luarocks-get-package luarocks-extract-package
+	@cd $(MOONSCRIPT_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)     \
+      "SYSDIR=$(MOONSCRIPT_SYSDIR)/../devel"  build-package
+	@cd $(LUAROCKS_SRCDIR) && $(MAKE) $(PRIO_LUA_MAKE_ARGS)       \
+      "SYSDIR=$(MOONSCRIPT_SYSDIR)/../devel"                      \
+      "INCLUDE_SYSDIR=$(MOONSCRIPT_SYSDIR)/../devel/include"      \
+      $(LUAROCKS_MAKE_ARGS) luarocks-build
+	@cd $(MOONSCRIPT_SYSDIR)/../devel/bin && ./luarocks install $(MOONSCRIPT_ROCKSPEC)
+
+moonscript-clone-repo: moonscript-makeenv moonscript-checkenv moonscript-update-makefile
+	@cd $(MOONSCRIPT_SRCDIR) && $(MAKE) $(MOONSCRIPT_MAKE_ARGS) clone-repo
+
+moonscript-update-repo: moonscript-makeenv moonscript-checkenv moonscript-update-makefile
+	@cd $(MOONSCRIPT_SRCDIR) && $(MAKE) $(MOONSCRIPT_MAKE_ARGS) update-repo
+
+moonscript-makeenv:
+	@$(TEST) -d $(MOONSCRIPT_SRCDIR)      || $(MAKDIR_P) $(VERBOSE_ARG) $(MOONSCRIPT_SRCDIR)
+	@$(TEST) -d $(MOONSCRIPT_BUILDDIR)    || $(MAKDIR_P) $(MOONSCRIPT_BUILDDIR)
+	@$(TEST) -d $(MOONSCRIPT_SYSDIR)      || $(MAKDIR_P) $(MOONSCRIPT_SYSDIR)
+	@$(TEST) -f $(MOONSCRIPT_MAKEFILE)    || $(COPY) $(VERBOSE_ARG) $(MOONSCRIPT_MAKEFILE_IN) $(MOONSCRIPT_MAKEFILE)
+
+moonscript-checkenv:
+	@$(TEST) -w $(MOONSCRIPT_SRCDIR)      || exit 1
+	@$(TEST) -w $(MOONSCRIPT_BUILDDIR)    || exit 1
+	@$(TEST) -w $(MOONSCRIPT_SYSDIR)      || exit 1
+	@$(TEST) -r $(MOONSCRIPT_MAKEFILE)    || exit 1
+
+moonscript-update-makefile:
+	@$(TEST) -f $(MOONSCRIPT_MAKEFILE_IN) || exit 1
+	@$(COPY) $(VERBOSE_ARG) $(MOONSCRIPT_MAKEFILE_IN) $(MOONSCRIPT_MAKEFILE)
+
 # --------- end of targets ---------------------
 
 all: prio-lua prio-lua-devel ravi-lua ravi-lua-devel aot-lua-devel moonjit-devel \
-     moonjit nelua
+     moonjit nelua moonscript moonscript-devel
 
 # --------- Lua Rocks --------------------------
 
